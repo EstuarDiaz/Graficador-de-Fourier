@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>math.js | plot</title>
+  <script src="https://unpkg.com/mathjs@5.4.2/dist/math.min.js"></script>
+
+  <script src="https://cdn.plot.ly/plotly-1.35.2.min.js"></script>
+
+  <style>
+    input[type=text] {
+      width: 300px;
+    }
+    input {
+      padding: 6px;
+    }
+    body, html, input {
+      font-family: sans-serif;
+      font-size: 11pt;
+
+    }
+    form {
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+
+<form id="form">
+  <label for="eq">L:</label>
+ <input type="text" id="l" value="3.14159" />
+   <label for="eq">c:</label>
+  <input type="text" id="c" value="1" />
+    <label for="eq">h:</label>
+  <input type="text" id="h" value="1" />
+    <label for="eq">Sn:</label>
+  <input type="text" id="sum" value="6" />
+    <label for="eq">dt:</label>
+  <input type="text" id="dt" value="0.1" />
+    <label for="eq">Number of times:</label>
+  <input type="text" id="number" value="20" />
+  <input type="submit" value="Draw" />
+</form>
+
+<div id="plot"></div>
+
+<p>
+  Used plot library: <a href="https://plot.ly/javascript/">Plotly</a>
+</p>
+
+<script>
+	let pi = Math.PI;
+  function f(n,l,c,x,t){
+    return (Math.sin(n*pi*0.5) * Math.sin((n*pi*x)/l) * Math.cos((n*pi*c*t)/l))/(n*n);
+  }
+
+	function Sn(n,l,c,x,t){
+		var result = 0;
+		for(var i = 1; i <= n; i++){
+			result += f(i,l,c,x,t);
+		}
+		return result;
+	}
+
+  function draw() {
+    try {
+      // compile the expression once
+      const l = document.getElementById('l').value;
+      const c = document.getElementById('c').value;
+      const sumN = document.getElementById('sum').value;
+      const dt = document.getElementById('dt').value;
+      const h = document.getElementById('h').value;
+      const number = document.getElementById('number').value;
+      // evaluate the expression repeatedly for different values of x
+      const xValues = math.range(0, l, 0.05).toArray()
+      var data = [];
+      for(var i = 0; i < number; i++){
+        var yValues = xValues.map(function(x){
+            return (8*h*Sn(sumN,l,c,x,dt*i))/(pi*pi);
+        });
+        data[i] = {
+          x: xValues,
+          y: yValues,
+          type: 'scatter'
+        }
+      }
+
+      Plotly.newPlot('plot', data)
+    }
+    catch (err) {
+      console.error(err)
+      alert(err)
+    }
+  }
+
+  document.getElementById('form').onsubmit = function (event) {
+    event.preventDefault()
+    draw()
+  }
+
+  draw()
+</script>
+
+</body>
+</html>
